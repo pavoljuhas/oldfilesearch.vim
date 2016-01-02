@@ -1,6 +1,19 @@
-" :OldFileSearch pattern1 [pattern2 ...]
+" oldfilesearch.vim -- search and edit a file from the :oldfiles list
+" Date: 2016-01-02
+" Maintainer: Pavol Juhas <pavol.juhas@gmail.com>
+" URL: https://github.com/pavoljuhas/oldfilesearch.vim
 "
-" DEBUG: unlet! loaded_oldfilesearch
+" Usage:
+"
+"   :OldFileSearch pattern1 [pattern2 ...]
+"
+"   Display a numbered list of oldfiles that match regular-expression patterns
+"   and prompt for a number to be edited.  Edit the file immediately if there
+"   is only one match.  For each matching file show its oldfile index #<n or
+"   the buffer number #n if already loaded.  A file is considered a match
+"   if all of the patterns match in its full path and at least one matches
+"   the tail component.  The search is case insensitive unless there is an
+"   upper-case character in any of the specified patterns.
 
 if exists("loaded_oldfilesearch") || &cp
     finish
