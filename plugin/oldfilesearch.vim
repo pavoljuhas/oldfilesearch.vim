@@ -49,8 +49,10 @@ function! s:OldFileSearch(patterns)
         return
     endif
     let target = candidates[0]
-    let choicelines = map(copy(candidates),
-                \ '(v:key + 1) . ") " . fnamemodify(v:val, ":~:.")')
+    let fmtexpr = '(v:key + 1) . ") " . ('
+                \ . '(bufnr(v:val) > 0) ? bufnr(v:val) : "<" . oldindex[v:val])'
+                \ . ' . " " . fnamemodify(v:val, ":~:.")'
+    let choicelines = map(copy(candidates), fmtexpr)
     if len(candidates) > 1
         let idx = inputlist(['Select old file:'] + choicelines) - 1
         if idx < 0 || idx >= len(candidates)
