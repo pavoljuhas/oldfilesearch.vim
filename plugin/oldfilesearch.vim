@@ -30,10 +30,8 @@ function! s:OldFileSearch(patterns)
     for l:f in v:oldfiles
         let oidx += 1
         let ffull = substitute(l:f, '^[~]/', expand('~/'), '')
-        if !has_key(oldindex, ffull)
-            call add(candidates, ffull)
-            let oldindex[ffull] = oidx
-        endif
+        call add(candidates, ffull)
+        let oldindex[ffull] = oidx
     endfor
     " Use smart-case matching.
     " (1) All patterns must match the full path.
