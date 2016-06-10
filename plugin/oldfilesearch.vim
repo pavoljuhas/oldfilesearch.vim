@@ -29,7 +29,7 @@ function! s:OldFileSearch(patterns)
     let oidx = 0
     for l:f in v:oldfiles
         let oidx += 1
-        let ffull = fnamemodify(l:f, ':p')
+        let ffull = substitute(l:f, '^[~]/', expand('~/'), '')
         if !has_key(oldindex, ffull)
             call add(candidates, ffull)
             let oldindex[ffull] = oidx
