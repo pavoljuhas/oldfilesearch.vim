@@ -7,13 +7,21 @@
 "
 "   :OldFileSearch pattern1 [pattern2 ...]
 "
-"   Display a numbered list of oldfiles that match regular-expression patterns
+"   Display a numbered list of oldfiles filtered to match regular-expressions
 "   and prompt for a number to be edited.  Edit the file immediately if there
-"   is only one match.  For each matching file show its oldfile index #<n or
-"   the buffer number #n if already loaded.  A file is considered a match
-"   if all of the patterns match in its full path and at least one matches
-"   the tail component.  The search is case insensitive unless there is an
-"   upper-case character in any of the specified patterns.
+"   is only one match.  For each matching file display its oldfile index #<n
+"   or the buffer number #n if it is already loaded.  An old file is considered
+"   a match if all patterns match somewhere in its full path and at least one
+"   pattern matches in its tail component.  This search is case insensitive
+"   unless there is an upper-case character in some pattern.
+"
+" Notes:
+"
+"   To access more old files increase the ' argument of the 'viminfo' option.
+"   As an example to change the default ' value to 500 use
+"
+"       let &viminfo = substitute(&viminfo, "'[^,]*", "'500", "")
+"
 
 if exists("loaded_oldfilesearch") || &cp
     finish
