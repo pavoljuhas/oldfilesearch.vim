@@ -75,12 +75,17 @@ function! s:GetOldFiles(patterns)
         call filter(candidates, 'v:val ' . rxcmp . ' l:p')
     endfor
     " (2) At least one pattern must match the tail component of the path.
-    " (Skip this if pattern contains path separator(s))
     let tailmatches = {}
     for l:f in candidates
         let ft = fnamemodify(l:f, ':t')
         for l:p in a:patterns
-            if l:p =~# '[/\\]' || (hasupcase ? ft =~# l:p : ft =~? l:p)
+            " Check for a simple match of the tail component.  Also check for
+            " patterns with path separator that span over the tail path.
+            let l:pf = l:p . '[^/\\]*$'
+            let l:ismatch = hasupcase ?
+                        \ (ft =~# l:p || l:f =~# l:pf) :
+                        \ (ft =~? l:p || l:f =~? l:pf)
+            if l:ismatch
                 let tailmatches[l:f] = 1
                 break
             endif
