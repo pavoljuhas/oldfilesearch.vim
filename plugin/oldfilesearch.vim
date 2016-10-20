@@ -71,17 +71,18 @@ function! s:GetOldFiles(patterns)
     " (1) All patterns must match the full path.
     let hasupcase = !empty(filter(copy(a:patterns), 'v:val =~ "[[:upper:]]"'))
     let rxcmp = hasupcase ? '=~#' : '=~?'
-    for l:p in a:patterns
+    let l:nomagic_patterns = map(copy(a:patterns), '"\\M" . v:val')
+    for l:p in l:nomagic_patterns
         call filter(candidates, 'v:val ' . rxcmp . ' l:p')
     endfor
     " (2) At least one pattern must match the tail component of the path.
     let tailmatches = {}
     for l:f in candidates
         let ft = fnamemodify(l:f, ':t')
-        for l:p in a:patterns
+        for l:p in l:nomagic_patterns
             " Check for a simple match of the tail component.  Also check for
             " patterns with path separator that span over the tail path.
-            let l:pf = l:p . '[^/\\]*$'
+            let l:pf = l:p . '\m[^/\\]*$'
             let l:ismatch = hasupcase ?
                         \ (ft =~# l:p || l:f =~# l:pf) :
                         \ (ft =~? l:p || l:f =~? l:pf)
