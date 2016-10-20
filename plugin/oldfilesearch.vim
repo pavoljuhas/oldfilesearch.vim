@@ -70,7 +70,7 @@ function! s:GetOldFiles(patterns)
     " Use smart-case matching.
     " (1) All patterns must match the full path.
     let hasupcase = !empty(filter(copy(a:patterns), 'v:val =~ "[[:upper:]]"'))
-    let rxcmp = hasupcase ? '=~?' : '=~#'
+    let rxcmp = hasupcase ? '=~#' : '=~?'
     for l:p in a:patterns
         call filter(candidates, 'v:val ' . rxcmp . ' l:p')
     endfor
