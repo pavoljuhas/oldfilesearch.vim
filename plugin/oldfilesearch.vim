@@ -28,9 +28,35 @@ if exists("loaded_oldfilesearch") || &cp
 endif
 let loaded_oldfilesearch = 1
 
-command! -nargs=+ OldFileSearch call s:OldFileSearch([<f-args>])
+command! -nargs=+ -complete=customlist,s:OldFileComplete
+\ OldFileSearch call s:OldFileSearch([<f-args>])
 
 function! s:OldFileSearch(patterns)
+    let [oldindex, candidates] = s:GetOldFiles(a:patterns)
+    if empty(candidates)
+        echo "No matching old file."
+        return
+    elseif len(candidates) == 1
+        edit `=candidates[0]`
+    else
+        let fmtexpr = '(v:key + 1) . ") " . ('
+                    \ . '(bufnr(v:val) > 0) ? bufnr(v:val) : "<" . oldindex[v:val])'
+                    \ . ' . " " . fnamemodify(v:val, ":~:.")'
+        let choicelines = map(copy(candidates), fmtexpr)
+        let idx = inputlist(['Select old file:'] + choicelines) - 1
+        if idx < 0 || idx >= len(candidates)
+            return
+        endif
+        edit `=candidates[idx]`
+    endif
+endfunction
+
+function! s:OldFileComplete(arglead, cmdline, cursorpos)
+    let pattern = a:arglead !=# '' ? escape(a:arglead, '.') : '.*'
+    return s:GetOldFiles([pattern])[1]
+endfunction
+
+function! s:GetOldFiles(patterns)
     " build a unique list of candidate old files
     let candidates = []
     let oldindex = {}
@@ -49,11 +75,12 @@ function! s:OldFileSearch(patterns)
         call filter(candidates, 'v:val ' . rxcmp . ' l:p')
     endfor
     " (2) At least one pattern must match the tail component of the path.
+    " (Skip this if pattern contains path separator(s))
     let tailmatches = {}
     for l:f in candidates
         let ft = fnamemodify(l:f, ':t')
         for l:p in a:patterns
-            if (hasupcase ? ft =~# l:p : ft =~? l:p)
+            if l:p =~# '[/\\]' || (hasupcase ? ft =~# l:p : ft =~? l:p)
                 let tailmatches[l:f] = 1
                 break
             endif
@@ -63,21 +90,5 @@ function! s:OldFileSearch(patterns)
     " (3) Discard non-existing files.
     call filter(candidates, 'filereadable(v:val)')
     let candidates = candidates[:(&lines - 1)]
-    if empty(candidates)
-        echo "No matching old file."
-        return
-    endif
-    let target = candidates[0]
-    let fmtexpr = '(v:key + 1) . ") " . ('
-                \ . '(bufnr(v:val) > 0) ? bufnr(v:val) : "<" . oldindex[v:val])'
-                \ . ' . " " . fnamemodify(v:val, ":~:.")'
-    let choicelines = map(copy(candidates), fmtexpr)
-    if len(candidates) > 1
-        let idx = inputlist(['Select old file:'] + choicelines) - 1
-        if idx < 0 || idx >= len(candidates)
-            return
-        endif
-        let target = candidates[idx]
-    endif
-    edit `=target`
+    return [oldindex, candidates]
 endfunction
