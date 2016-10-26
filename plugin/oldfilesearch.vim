@@ -31,6 +31,7 @@ let loaded_oldfilesearch = 1
 command! -nargs=+ -complete=customlist,s:OldFileComplete
 \ OldFileSearch call s:OldFileSearch([<f-args>])
 
+
 function! s:OldFileSearch(patterns)
     let [oldindex, candidates] = s:GetOldFiles(a:patterns)
     if empty(candidates)
@@ -51,10 +52,15 @@ function! s:OldFileSearch(patterns)
     endif
 endfunction
 
+
 function! s:OldFileComplete(arglead, cmdline, cursorpos)
-    let pattern = a:arglead !=# '' ? escape(a:arglead, '.') : '.*'
-    return s:GetOldFiles([pattern])[1]
+    let start = matchend(a:cmdline, 'Ol\%[dFileSearch]\s*')
+    let cmdargs = split(a:cmdline[start:], '\s\+')
+    let patterns = empty(cmdargs) ? [''] : cmdargs
+    let [oldindex, candidates] = s:GetOldFiles(patterns)
+    return candidates
 endfunction
+
 
 function! s:GetOldFiles(patterns)
     " build a unique list of candidate old files
@@ -67,26 +73,22 @@ function! s:GetOldFiles(patterns)
         call add(candidates, ffull)
         let oldindex[ffull] = oidx
     endfor
-    " Use smart-case matching.
+    " Adjust patterns to perform smart-case, nomagic matching.
+    let l:scnomagic_patterns = map(copy(a:patterns),
+                \ '((v:val =~ "[[:upper:]]") ? "\\C" : "\\c") . "\\M" . v:val')
     " (1) All patterns must match the full path.
-    let hasupcase = !empty(filter(copy(a:patterns), 'v:val =~ "[[:upper:]]"'))
-    let rxcmp = hasupcase ? '=~#' : '=~?'
-    let l:nomagic_patterns = map(copy(a:patterns), '"\\M" . v:val')
-    for l:p in l:nomagic_patterns
-        call filter(candidates, 'v:val ' . rxcmp . ' l:p')
+    for l:p in l:scnomagic_patterns
+        call filter(candidates, 'v:val =~ l:p')
     endfor
     " (2) At least one pattern must match the tail component of the path.
     let tailmatches = {}
     for l:f in candidates
         let ft = fnamemodify(l:f, ':t')
-        for l:p in l:nomagic_patterns
+        for l:p in l:scnomagic_patterns
             " Check for a simple match of the tail component.  Also check for
             " patterns with path separator that span over the tail path.
             let l:pf = l:p . '\m[^/\\]*$'
-            let l:ismatch = hasupcase ?
-                        \ (ft =~# l:p || l:f =~# l:pf) :
-                        \ (ft =~? l:p || l:f =~? l:pf)
-            if l:ismatch
+            if ft =~ l:p || l:f =~ l:pf
                 let tailmatches[l:f] = 1
                 break
             endif
