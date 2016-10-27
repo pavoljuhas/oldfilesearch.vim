@@ -29,7 +29,7 @@ endif
 let loaded_oldfilesearch = 1
 
 command! -nargs=+ -complete=customlist,s:OldFileComplete
-\ OldFileSearch call s:OldFileSearch([<f-args>])
+            \ OldFileSearch call s:OldFileSearch([<f-args>])
 
 
 function! s:OldFileSearch(patterns)
@@ -97,6 +97,5 @@ function! s:GetOldFiles(patterns)
     call filter(candidates, 'has_key(tailmatches, v:val)')
     " (3) Discard non-existing files.
     call filter(candidates, 'filereadable(v:val)')
-    let candidates = candidates[:(&lines - 1)]
     return [oldindex, candidates]
 endfunction
