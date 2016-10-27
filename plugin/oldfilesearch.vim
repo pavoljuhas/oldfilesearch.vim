@@ -20,7 +20,7 @@
 "   To access more old files increase the ' argument of the 'viminfo' option.
 "   As an example to change the default ' value to 500 use
 "
-"       let &viminfo = substitute(&viminfo, "'[^,]*", "'500", "")
+"       let &viminfo = substitute(&viminfo, "'\\zs\\d*", "500", "")
 "
 
 if exists("loaded_oldfilesearch") || &cp
