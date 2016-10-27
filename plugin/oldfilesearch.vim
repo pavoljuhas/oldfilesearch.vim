@@ -1,5 +1,5 @@
 " oldfilesearch.vim -- search and edit a file from the :oldfiles list
-" Date: 2016-01-02
+" Date: 2016-10-27
 " Maintainer: Pavol Juhas <pavol.juhas@gmail.com>
 " URL: https://github.com/pavoljuhas/oldfilesearch.vim
 "
@@ -12,8 +12,8 @@
 "   is only one match.  For each matching file display its oldfile index #<n
 "   or the buffer number #n if it is already loaded.  An old file is considered
 "   a match if all patterns match somewhere in its full path and at least one
-"   pattern matches in its tail component.  This search is case insensitive
-"   unless there is an upper-case character in some pattern.
+"   pattern matches in its tail component.  The search is case insensitive
+"   unless there is an upper-case character in the pattern.
 "
 " Notes:
 "
