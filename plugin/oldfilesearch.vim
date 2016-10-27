@@ -56,7 +56,7 @@ endfunction
 function! s:OldFileComplete(arglead, cmdline, cursorpos)
     let start = matchend(a:cmdline, 'Ol\%[dFileSearch]\s*')
     let cmdargs = split(a:cmdline[start:], '\s\+')
-    let patterns = empty(cmdargs) ? [''] : cmdargs
+    let patterns = empty(a:arglead) ? (cmdargs + ['']) : cmdargs
     let [oldindex, candidates] = s:GetOldFiles(patterns)
     return candidates
 endfunction
