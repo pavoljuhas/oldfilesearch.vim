@@ -1,0 +1,75 @@
+*oldfilesearch.txt* *oldfilesearch* Searching the oldfiles list
+
+Author: Pavol Juhas <pavol.juhas@gmail.com>
+Contributor: Takuya Fujiwara <tyru.exe@gmail.com>
+URL: https://github.com/pavoljuhas/oldfilesearch.vim
+Version: 0.0.1
+License: ...
+
+==============================================================================
+CONTENTS						*oldfilesearch-contents*
+
+Introduction		|oldfilesearch-introduction|
+Commands			|oldfilesearch-commands|
+Tips				|oldfilesearch-tips|
+
+==============================================================================
+INTRODUCTION						*oldfilesearch-introduction* {{{
+
+Add `:OldFileSearch` command for searching the `:oldfiles` list
+and displaying input menu to edit one file.  The found files must
+match all patterns provided on the command line and also one pattern
+within their tail-components.
+
+* Select old files that contain "vimrc" in their name:
+>
+  :OldFileSearch vimrc
+<
+* Select oldfiles that contain both "ftpl" and "python.vim" in their
+  full path.  This should match `~/.vim/ftplugin/python.vim` if present
+  in `:oldfiles`.
+>
+  :OldFileSearch ftpl python.vim
+<
+* Select oldfiles that reside in some "bin" directory:
+>
+  :OldFileSearch /bin/
+<
+* Select oldfiles that reside under the ".vim" directory.
+  Here the "$" pattern is always a match within file tail
+  therefore ".vim/" may match anywhere in its full path.
+>
+  :OldFileSearch .vim/ $
+<
+}}}
+==============================================================================
+COMMANDS					*oldfilesearch-commands* {{{
+
+							*:OldFileSearch*
+:OldFileSearch {pattern1} [{pattern2} ...]
+
+Display a numbered list of |v:oldfiles| filtered to match regular-expressions
+and prompt for a number to be edited.  Edit the file immediately if there
+is only one match.  For each matching file display its oldfile index #<n
+or the buffer number #n if it is already loaded.  An old file is considered
+a match if all patterns match somewhere in its full path and at least one
+pattern matches in its tail component.  The search is case insensitive
+unless there is an upper-case character in the pattern.
+
+}}}
+==============================================================================
+TIPS					*oldfilesearch-tips* {{{
+
+To access more old files increase the ' argument of the 'viminfo' option.
+As an example to change the default ' value to 500 use
+>
+    let &viminfo = substitute(&viminfo, "'\\zs\\d*", "500", "")
+<
+The `:OldFileSearch` command also supports `<Tab>` completion
+which allows to cycle over the matching files.
+>
+  :OldFileSearch plugin/ .vim<Tab>
+<
+}}}
+==============================================================================
+vim:tw=78:fo=tcq2mM:ts=4:ft=help:norl:noet:fdm=marker:fen
