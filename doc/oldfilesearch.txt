@@ -4,7 +4,7 @@ Author: Pavol Juhas <pavol.juhas@gmail.com>
 Contributor: Takuya Fujiwara <tyru.exe@gmail.com>
 URL: https://github.com/pavoljuhas/oldfilesearch.vim
 Version: 0.0.1
-License: ...
+License: Distributable under the same terms as Vim itself (see :help license)
 
 ==============================================================================
 CONTENTS						*oldfilesearch-contents*
