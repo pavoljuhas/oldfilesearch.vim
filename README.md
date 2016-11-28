@@ -64,3 +64,9 @@ a plain `/` or `.` without backslash quoting.
   ```VimL
   :OldFileSearch .vim/ $
   ```
+
+
+## License
+
+Copyright (c) Pavol Juhas.  Distributed under the same terms as Vim itself
+(see `:help license`).
