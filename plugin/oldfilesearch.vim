@@ -1,7 +1,9 @@
 " oldfilesearch.vim -- search and edit a file from the :oldfiles list
 " Date: 2016-10-27
 " Maintainer: Pavol Juhas <pavol.juhas@gmail.com>
+" Contributor: Takuya Fujiwara <tyru.exe@gmail.com>
 " URL: https://github.com/pavoljuhas/oldfilesearch.vim
+" License: Distributable under the same terms as Vim itself (see :help license).
 "
 " Usage:
 "
