@@ -35,6 +35,9 @@ command! -nargs=+ -complete=customlist,s:OldFileComplete
 
 
 function! s:OldFileSearch(patterns)
+    if len(a:patterns) == 1 && filereadable(a:patterns[0])
+        edit `=a:patterns[0]`
+    endif
     let [oldindex, candidates] = s:GetOldFiles(a:patterns)
     if empty(candidates)
         echo "No matching old file."
