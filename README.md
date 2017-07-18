@@ -1,14 +1,13 @@
 # oldfilesearch.vim
 
-This plugin provides the `:OldFileSearch` command for filtering the
-`:oldfiles` list of files and displaying selection menu to open one
-of them.  The displayed files must exist and must also match all
-patterns in their full paths and at least one pattern in their tail
-names.  The patterns are matched as 'nomagic' regular expressions.  The
-search is case insensitive unless there is an upper-case character in
-the pattern.  The matching files are displayed together with their
-oldfile index `#<n` or with buffer number `#n` when already loaded
-in the editor.
+Add `:OldFileSearch` command to filter a list of `:oldfiles` and
+regular buffers and display a selection menu to open one of them.
+The displayed files must exist and must match all patterns in their
+full paths and at least one pattern in their tail name.  The patterns
+are matched as 'nomagic' regular expressions.  The search is case
+insensitive unless there is an upper-case character in the pattern.
+The matching files are displayed together with their oldfile index
+`#<n` or with buffer number `#n` when already loaded in the editor.
 
 **Note:** As of Vim 8 a similar selection can be accomplished using
 the built-in command `:filter /pattern/ browse oldfiles`.  In a subtle

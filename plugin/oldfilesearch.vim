@@ -1,5 +1,5 @@
 " oldfilesearch.vim -- search and edit a file from the :oldfiles list
-" Date: 2016-10-27
+" Date: 2017-07-18
 " Maintainer: Pavol Juhas <pavol.juhas@gmail.com>
 " Contributor: Takuya Fujiwara <tyru.exe@gmail.com>
 " URL: https://github.com/pavoljuhas/oldfilesearch.vim
@@ -64,8 +64,8 @@ function! s:OldFileComplete(arglead, cmdline, cursorpos)
 endfunction
 
 
-function! s:GetOldFiles(patterns)
-    " build a unique list of candidate old files
+function! s:GetOldFiles(patterns) abort
+    " Build a unique list of candidate old files.
     let candidates = []
     let oldindex = {}
     let oidx = 0
@@ -74,6 +74,20 @@ function! s:GetOldFiles(patterns)
         let ffull = substitute(l:f, '^[~]/', expand('~/'), '')
         call add(candidates, ffull)
         let oldindex[ffull] = oidx
+    endfor
+    " Prepend all regular buffers that are not yet candidates.
+    for l:b in reverse(range(1, bufnr('$')))
+        " skip non-existing and special buffers.
+        if !bufexists(l:b) || !empty(getbufvar(l:b, '&buftype'))
+            continue
+        endif
+        " skip buffers that are already candidates.
+        let bfull = fnamemodify(bufname(l:b), ':p')
+        if has_key(oldindex, bfull)
+            continue
+        endif
+        let oldindex[bfull] = ''
+        call insert(candidates, bfull)
     endfor
     " Adjust patterns to perform smart-case, nomagic matching.
     let l:scnomagic_patterns = map(copy(a:patterns),
