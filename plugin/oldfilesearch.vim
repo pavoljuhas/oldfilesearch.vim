@@ -1,5 +1,5 @@
 " oldfilesearch.vim -- search and edit a file from the :oldfiles list
-" Date: 2017-07-18
+" Date: 2017-07-20
 " Maintainer: Pavol Juhas <pavol.juhas@gmail.com>
 " Contributor: Takuya Fujiwara <tyru.exe@gmail.com>
 " URL: https://github.com/pavoljuhas/oldfilesearch.vim
@@ -77,8 +77,8 @@ function! s:GetOldFiles(patterns) abort
     endfor
     " Prepend all regular buffers that are not yet candidates.
     for l:b in reverse(range(1, bufnr('$')))
-        " skip non-existing and special buffers.
-        if !bufexists(l:b) || !empty(getbufvar(l:b, '&buftype'))
+        " skip non-existing, unnamed and special buffers.
+        if empty(bufname(l:b)) || !empty(getbufvar(l:b, '&buftype'))
             continue
         endif
         " skip buffers that are already candidates.
