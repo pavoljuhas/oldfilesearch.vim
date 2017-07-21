@@ -1,5 +1,5 @@
 " oldfilesearch.vim -- search and edit a file from the :oldfiles list
-" Date: 2017-07-20
+" Date: 2017-07-21
 " Maintainer: Pavol Juhas <pavol.juhas@gmail.com>
 " Contributor: Takuya Fujiwara <tyru.exe@gmail.com>
 " URL: https://github.com/pavoljuhas/oldfilesearch.vim
@@ -65,28 +65,29 @@ endfunction
 
 
 function! s:GetOldFiles(patterns) abort
-    " Build a unique list of candidate old files.
+    " Build a list of candidates.  Start with old files that are not open.
     let candidates = []
     let oldindex = {}
     let oidx = 0
     for l:f in v:oldfiles
         let oidx += 1
         let ffull = substitute(l:f, '^[~]/', expand('~/'), '')
-        call add(candidates, ffull)
         let oldindex[ffull] = oidx
+        if !bufexists(ffull)
+            call add(candidates, ffull)
+        endif
     endfor
-    " Prepend all regular buffers that are not yet candidates.
+    " Prepend all regular buffers to the begining of the candidate list.
     for l:b in reverse(range(1, bufnr('$')))
         " skip non-existing, unnamed and special buffers.
         if empty(bufname(l:b)) || !empty(getbufvar(l:b, '&buftype'))
             continue
         endif
-        " skip buffers that are already candidates.
         let bfull = fnamemodify(bufname(l:b), ':p')
-        if has_key(oldindex, bfull)
-            continue
+        " make sure all candidates are present in oldindex keys.
+        if !has_key(oldindex, bfull)
+            let oldindex[bfull] = ''
         endif
-        let oldindex[bfull] = ''
         call insert(candidates, bfull)
     endfor
     " Adjust patterns to perform smart-case, nomagic matching.
