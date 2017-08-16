@@ -1,5 +1,5 @@
 " oldfilesearch.vim -- search and edit a file from the :oldfiles list
-" Date: 2017-07-21
+" Date: 2017-08-16
 " Maintainer: Pavol Juhas <pavol.juhas@gmail.com>
 " Contributor: Takuya Fujiwara <tyru.exe@gmail.com>
 " URL: https://github.com/pavoljuhas/oldfilesearch.vim
@@ -68,10 +68,8 @@ function! s:GetOldFiles(patterns) abort
     " Build a list of candidates.  Start with old files that are not open.
     let candidates = []
     let oldindex = {}
-    let oidx = 0
-    for l:f in v:oldfiles
-        let oidx += 1
-        let ffull = substitute(l:f, '^[~]/', expand('~/'), '')
+    for oidx in range(1, len(v:oldfiles) + 1)
+        let ffull = expand('#<' . oidx . ':p')
         let oldindex[ffull] = oidx
         if !bufexists(ffull)
             call add(candidates, ffull)
