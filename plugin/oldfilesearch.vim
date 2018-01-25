@@ -43,7 +43,7 @@ function! s:OldFileSearch(patterns)
         edit `=candidates[0]`
     else
         let fmtexpr = '(v:key + 1) . ") " . ('
-                    \ . '(bufnr(v:val) > 0) ? bufnr(v:val) : "<" . oldindex[v:val])'
+                    \ . 'oldindex[v:val] ? "<" . oldindex[v:val] : bufnr(v:val))'
                     \ . ' . " " . fnamemodify(v:val, ":~:.")'
         let choicelines = map(copy(candidates), fmtexpr)
         let idx = inputlist(['Select old file:'] + choicelines) - 1
@@ -68,28 +68,29 @@ function! s:GetOldFiles(patterns) abort
     " Build a list of candidates.  Start with old files that are not open.
     let candidates = []
     let oldindex = {}
-    let oidx = 0
-    let homeslash = expand('~/')
-    for l:f in v:oldfiles
-        let oidx += 1
-        let ffull = substitute(l:f, '^[~]/', homeslash, '')
-        let oldindex[ffull] = oidx
-        if !bufexists(ffull)
-            call add(candidates, ffull)
-        endif
-    endfor
     " Prepend all regular buffers to the begining of the candidate list.
-    for l:b in reverse(range(1, bufnr('$')))
+    for l:b in range(1, bufnr('$'))
         " skip non-existing, unnamed and special buffers.
         if empty(bufname(l:b)) || !empty(getbufvar(l:b, '&buftype'))
             continue
         endif
         let bfull = fnamemodify(bufname(l:b), ':p')
-        " make sure all candidates are present in oldindex keys.
-        if !has_key(oldindex, bfull)
-            let oldindex[bfull] = ''
+        " use old-index zero for existing buffers
+        let oldindex[bfull] = 0
+        call add(candidates, bfull)
+    endfor
+    " Now add expanded oldfiles that are not yet in candidates
+    let oidx = 0
+    let homeslash = expand('~/')
+    for l:f in v:oldfiles
+        let oidx += 1
+        let ffull = substitute(l:f, '^[~]/', homeslash, '')
+        " skip old files that are already in candidates
+        if has_key(oldindex, ffull)
+            continue
         endif
-        call insert(candidates, bfull)
+        let oldindex[ffull] = oidx
+        call add(candidates, ffull)
     endfor
     " Adjust patterns to perform smart-case, nomagic matching.
     let l:scnomagic_patterns = map(copy(a:patterns),
