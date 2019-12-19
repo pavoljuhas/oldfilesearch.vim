@@ -105,9 +105,9 @@ function! s:GetOldFiles(patterns) abort
         let ft = fnamemodify(l:f, ':t')
         for l:p in l:scnomagic_patterns
             " Check for a simple match of the tail component.  Also check for
-            " patterns with path separator that span over the tail path.
+            " patterns that span the tail path allowing for the `$` " anchor.
             let l:pf = l:p . '\m[^/\\]*$'
-            if ft =~ l:p || l:f =~ l:pf
+            if ft =~ l:p || matchend(l:f, l:p) == strlen(l:f) || l:f =~ l:pf
                 let tailmatches[l:f] = 1
                 break
             endif
