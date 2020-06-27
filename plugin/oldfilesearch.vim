@@ -31,17 +31,16 @@ endif
 let loaded_oldfilesearch = 1
 
 command! -nargs=+ -complete=customlist,s:OldFileComplete
-            \ OldFileSearch call s:OldFileSearch([<f-args>])
+            \ OldFileSearch call s:OldFileSearch([<f-args>], <q-mods>)
 
 
-function! s:OldFileSearch(patterns)
+function! s:OldFileSearch(patterns, mods)
     let [oldindex, candidates] = s:GetOldFiles(a:patterns)
+    let idx = 0
     if empty(candidates)
         echo "No matching old file."
         return
-    elseif len(candidates) == 1
-        edit `=candidates[0]`
-    else
+    elseif len(candidates) > 1
         let fmtexpr = '(v:key + 1) . ") " . ('
                     \ . 'oldindex[v:val] ? "<" . oldindex[v:val] : bufnr(v:val))'
                     \ . ' . " " . fnamemodify(v:val, ":~:.")'
@@ -50,8 +49,9 @@ function! s:OldFileSearch(patterns)
         if idx < 0 || idx >= len(candidates)
             return
         endif
-        edit `=candidates[idx]`
     endif
+    let ecmd = empty(a:mods) ? 'edit' : 'split'
+    execute a:mods ecmd '`=candidates[idx]`'
 endfunction
 
 
