@@ -92,14 +92,31 @@ function! s:GetOldFiles(patterns) abort
         let oldindex[ffull] = oidx
         call add(candidates, ffull)
     endfor
+    let l:negative_patterns = []
+    let l:scnomagic_patterns = []
+    for l:p in a:patterns
+        if l:p =~ '\v^!.'
+            call add(l:negative_patterns, l:p[1:])
+        else
+            call add(l:scnomagic_patterns, l:p)
+        endif
+    endfor
+    if empty(l:scnomagic_patterns)
+        call add(l:scnomagic_patterns, '$')
+    endif
     " Adjust patterns to perform smart-case, nomagic matching.
-    let l:scnomagic_patterns = map(copy(a:patterns),
-                \ '((v:val =~ "[[:upper:]]") ? "\\C" : "\\c") . "\\M" . v:val')
-    " (1) All patterns must match the full path.
+    let toscnm = '((v:val =~ "[[:upper:]]") ? "\\C" : "\\c") . "\\M" . v:val'
+    call map(l:negative_patterns, toscnm)
+    call map(l:scnomagic_patterns, toscnm)
+    " (1) Apply negative patterns
+    for l:p in l:negative_patterns
+        call filter(candidates, 'v:val !~ l:p')
+    endfor
+    " (2) All patterns must match the full path.
     for l:p in l:scnomagic_patterns
         call filter(candidates, 'v:val =~ l:p')
     endfor
-    " (2) At least one pattern must match the tail component of the path.
+    " (3) At least one pattern must match the tail component of the path.
     let tailmatches = {}
     for l:f in candidates
         let ft = fnamemodify(l:f, ':t')
