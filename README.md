@@ -26,6 +26,17 @@ a plain `/` or `.` without backslash quoting.
   let &viminfo = substitute(&viminfo, "'\\zs\\d*", "500", "")
   ```
 
+* The response time of the initial call of :OldFileSearch can be improved with
+
+  ```
+  let g:oldfilesearch_enable_warm_up = 1
+  ```
+
+  which checks existence of old files in a background after vim startup.
+  This makes a notable difference for old files residing on network or
+  other lower-latency devices.  The response is also improved for the
+  fzf :History command.
+
 * The `:OldFileSearch` command also supports `<Tab>` completion
   which allows to cycle over the matching files.
 

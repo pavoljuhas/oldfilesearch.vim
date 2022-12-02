@@ -24,14 +24,26 @@
 "
 "       let &viminfo = substitute(&viminfo, "'\\zs\\d*", "500", "")
 "
+"   The response time of the first call of :OldFileSearch can be improved using
+"
+"       let g:oldfilesearch_enable_warm_up = 1
+"
+"   which checks existence of old files in a background after vim startup.
+"   This makes a notable difference when old files reside on network drive or
+"   low-latency devices.  The response is also improved for the fzf :History
+"   command.
 
-if exists("loaded_oldfilesearch") || &cp
+if exists('g:loaded_oldfilesearch') || &cp
     finish
 endif
-let loaded_oldfilesearch = 1
+let g:loaded_oldfilesearch = 1
 
 command! -nargs=+ -complete=customlist,s:OldFileComplete
             \ OldFileSearch call s:OldFileSearch([<f-args>], <q-mods>)
+
+if exists('g:oldfilesearch_enable_warm_up') && g:oldfilesearch_enable_warm_up
+    autocmd VimEnter * ++once call s:WarmUpOldFiles()
+endif
 
 
 function! s:OldFileSearch(patterns, mods)
@@ -81,10 +93,8 @@ function! s:GetOldFiles(patterns) abort
     endfor
     " Now add expanded oldfiles that are not yet in candidates
     let oidx = 0
-    let homeslash = expand('~/')
-    for l:f in v:oldfiles
+    for ffull in s:ExpandOldFiles()
         let oidx += 1
-        let ffull = substitute(l:f, '^[~]/', homeslash, '')
         " skip old files that are already in candidates
         if has_key(oldindex, ffull)
             continue
@@ -134,4 +144,19 @@ function! s:GetOldFiles(patterns) abort
     " (3) Discard non-existing files.
     call filter(candidates, 'filereadable(v:val)')
     return [oldindex, candidates]
+endfunction
+
+
+function! s:ExpandOldFiles()
+    let homeslash = expand('~/')
+    return map(copy(v:oldfiles), "substitute(v:val, '\\m^[~]/', homeslash, '')")
+endfunction
+
+
+function! s:WarmUpOldFiles()
+    if has('job') && !empty(v:oldfiles) && executable('/bin/ls') == 1
+        let jobcmdargs = ['/bin/ls', '-d', '--'] + s:ExpandOldFiles()
+        call job_start(jobcmdargs,
+                    \ {"in_io": "null", "out_io": "null", "err_io": "null"})
+    endif
 endfunction
