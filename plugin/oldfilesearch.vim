@@ -1,5 +1,5 @@
 " oldfilesearch.vim -- search and edit a file from the :oldfiles list
-" Date: 2018-01-25
+" Date: 2022-12-06
 " Maintainer: Pavol Juhas <pavol.juhas@gmail.com>
 " Contributor: Takuya Fujiwara <tyru.exe@gmail.com>
 " URL: https://github.com/pavoljuhas/oldfilesearch.vim
